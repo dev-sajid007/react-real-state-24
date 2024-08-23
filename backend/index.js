@@ -12,7 +12,10 @@ const port = 4000;
 
 //middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // Adjust according to your frontend domain
+  credentials: true // Allows cookies to be sent and received
+}));
 
 //db connection
 conenctDB();
@@ -20,6 +23,7 @@ conenctDB();
 //api endpint
 app.use("/api/user",userRouter);
 app.use("/api/auth",authRouter);
+
 
 //error middleware
 app.use((err,req,res,next) => {
