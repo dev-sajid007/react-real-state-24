@@ -2,11 +2,14 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axiosClient from '../axios-client.js';
 import { toast } from 'react-toastify';
+import { useDispatch, useSelector } from 'react-redux';
+import { signInStart,signInSuccess,signInFailure } from '../redux/user/userSlice.js';
 
 const SignIn = () => {
   const [formData, setFormData] = useState({});
-  const [loading, setLoading] = useState(false);
+  const {loading,error} = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     setFormData({
@@ -18,20 +21,20 @@ const SignIn = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setLoading(true);
+      dispatch(signInStart());
       const res = await axiosClient.post("/auth/signin", formData);
       
       if (res.data.success) {
-        setLoading(false);
+        dispatch(signInSuccess(res.data.data));
         toast.success(res.data.message);
         navigate("/");
       }
       else{
-        setLoading(false);
+        dispatch(signInFailure(res.data.message));
         toast.error(res.data.message);
       }
     } catch (error) {
-      setLoading(false);
+      dispatch(signInFailure(error.message));
       toast.error("Error!");
     }
   }
